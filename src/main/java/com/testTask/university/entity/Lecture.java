@@ -11,6 +11,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Entity
+@Table(name = "lecture")
 public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +25,7 @@ public class Lecture {
     private Date date;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "schedule.id")
+    @JoinColumn(name = "schedule_id")
     @ToString.Exclude
     private Schedule schedule;
 
