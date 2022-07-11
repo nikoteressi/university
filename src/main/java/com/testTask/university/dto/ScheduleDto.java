@@ -13,5 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ScheduleDto {
     private long scheduleId;
+    private String date;
+    private long group_id;
     private List<LectureDto> lectures;
 }

@@ -14,44 +14,49 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@Table(name = "lecture")
+@Table(name = "groups")
 @JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
-public class Lecture {
+public class Group {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private long id;
 
     @Column
-    private String name;
+    private int number;
 
-    @Column
-    private String date;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "group")
+    private List<Student> students;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "lectures")
-    private List<Audience> audiences;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "group")
+    private Schedule schedule;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "lectures")
-    private List<Group> groups;
+
+    @ManyToMany
+    @JoinTable(name = "lectures_groups"
+            , joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "lecture_id"))
+    private List<Lecture> lectures;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Lecture lecture = (Lecture) o;
-        return name.equals(lecture.name) && date.equals(lecture.date);
+        Group group = (Group) o;
+        return number == group.number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, date);
+        return Objects.hash(number);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "name = " + name + ", " +
-                "date = " + date + ")";
+        return "Group{" +
+                "id=" + id +
+                ", number=" + number +
+                '}';
     }
 }

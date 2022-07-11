@@ -11,10 +11,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LectureDto {
-    private long lectureId;
-    private String lectureName;
-    private String lectureDate;
-    private List<AudienceDto> audiences;
-    private List<GroupDto> groups;
+public class GroupDto {
+    private long id;
+    private int number;
+    private List<StudentDto> students;
+    private List<LectureDto> lectures;
 }

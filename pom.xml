@@ -11,6 +11,7 @@
 	<groupId>com.testTask</groupId>
 	<artifactId>university</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>university</name>
 	<description>Test task for Elinext</description>
 	<properties>
@@ -40,6 +41,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.0</version>
 		</dependency>
     </dependencies>
 
