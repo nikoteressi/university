@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,5 +12,4 @@ import java.util.List;
 public class AudienceDto {
     private long id;
     private int number;
-    private List<LectureDto> lectures;
 }

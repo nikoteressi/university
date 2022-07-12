@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,6 +13,6 @@ public class LectureDto {
     private long lectureId;
     private String lectureName;
     private String lectureDate;
-    private List<AudienceDto> audiences;
-    private List<GroupDto> groups;
+    private int audienceNumber;
+    private int groupNumber;
 }

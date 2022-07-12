@@ -2,6 +2,7 @@ package com.testTask.university.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.Objects;
 
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -24,7 +26,7 @@ public class Schedule {
     @Column
     private String date;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "group_id", referencedColumnName = "id")
     Group group;
 
@@ -33,7 +35,7 @@ public class Schedule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Schedule schedule = (Schedule) o;
-        return date.equals(schedule.date) && group.equals(schedule.group);
+        return Objects.equals(date, schedule.date) && Objects.equals(group, schedule.group);
     }
 
     @Override

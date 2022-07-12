@@ -2,6 +2,7 @@ package com.testTask.university.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -11,11 +12,11 @@ import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "groups")
-@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Group {
 
     @Id
@@ -29,15 +30,11 @@ public class Group {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "group")
     private List<Student> students;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "group")
-    private Schedule schedule;
-
-
-    @ManyToMany
-    @JoinTable(name = "lectures_groups"
-            , joinColumns = @JoinColumn(name = "group_id"),
-            inverseJoinColumns = @JoinColumn(name = "lecture_id"))
+    @OneToMany (mappedBy = "group")
     private List<Lecture> lectures;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "group")
+    private Schedule schedule;
 
     @Override
     public boolean equals(Object o) {

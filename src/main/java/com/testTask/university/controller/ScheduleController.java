@@ -1,7 +1,6 @@
 package com.testTask.university.controller;
 
 import com.testTask.university.dto.ScheduleDto;
-import com.testTask.university.exceptions.AlreadyExistException;
 import com.testTask.university.exceptions.NotExistException;
 import com.testTask.university.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/new-schedule")
-    public List<ScheduleDto> addSchedule(@RequestBody ScheduleDto schedule) throws AlreadyExistException {
+    public List<ScheduleDto> addSchedule(@RequestBody ScheduleDto schedule) throws Exception {
         return scheduleService.createNewSchedule(schedule);
     }
 

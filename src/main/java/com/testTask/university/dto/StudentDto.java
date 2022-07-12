@@ -13,5 +13,5 @@ public class StudentDto {
     private long studentId;
     private String firstName;
     private String LastName;
-    private long groupId;
+    private int groupNumber;
 }

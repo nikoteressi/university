@@ -1,7 +1,6 @@
 package com.testTask.university.service;
 
 import com.testTask.university.dto.AudienceDto;
-import com.testTask.university.exceptions.NotExistException;
 
 import java.util.List;
 
@@ -13,5 +12,5 @@ public interface AudienceService {
 
     AudienceDto editAudience(AudienceDto audience) throws Exception;
 
-    String removeAudience(long audienceId) throws NotExistException;
+    String removeAudience(long audienceId) throws Exception;
 }

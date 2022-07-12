@@ -1,30 +1,26 @@
 package com.testTask.university.services;
 
+import com.testTask.university.dao.GroupRepository;
 import com.testTask.university.dao.StudentRepository;
-import com.testTask.university.dto.ScheduleDto;
 import com.testTask.university.dto.StudentDto;
+import com.testTask.university.entity.Group;
 import com.testTask.university.entity.Schedule;
 import com.testTask.university.entity.Student;
-import com.testTask.university.exceptions.AlreadyExistException;
 import com.testTask.university.exceptions.NotExistException;
+import com.testTask.university.exceptions.WrongInputDataException;
 import com.testTask.university.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
 @SpringBootTest
 public class StudentServiceTest {
@@ -34,16 +30,17 @@ public class StudentServiceTest {
     @MockBean
     private StudentRepository repository;
 
+    @MockBean
+    private GroupRepository groupRepository;
+
     @Test
     void shouldReturnListWithStudents() {
         List<Student> students = new ArrayList<>();
-        students.add(new Student(1L, "Vasya", "Petrov", new Schedule()));
+        students.add(new Student(1L, "name", "lastname", new Group()));
         when(repository.findAll()).thenReturn(students);
         List<StudentDto> studentsFromDb = service.getAllStudents();
         verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
         assertEquals(1, studentsFromDb.size());
-        assertEquals("Vasya", studentsFromDb.get(0).getFirstName());
     }
 
     @Test
@@ -51,77 +48,139 @@ public class StudentServiceTest {
         List<Student> students = new ArrayList<>();
         when(repository.findAll()).thenReturn(students);
         List<StudentDto> studentsFromDb = service.getAllStudents();
-        verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
         assertTrue(studentsFromDb.isEmpty());
     }
 
     @Test
-    void shouldReturnAllStudentsAfterCreateNew() throws AlreadyExistException {
+    void shouldReturnAllStudentsAfterCreateNew() throws Exception {
+        Group group = new Group(1L, 1, new ArrayList<>(), new ArrayList<>(), new Schedule());
+        Student student = new Student(1L, "name", "lastname", group);
         List<Student> list = new ArrayList<>();
-        list.add(new Student(1L, "Vasya", "Petrov", new Schedule()));
+        list.add(student);
         when(repository.findAll()).thenReturn(list);
-        List<StudentDto> studentsFromDb = service.createNewStudent(new StudentDto());
-        verify(repository, times(1)).save(new Student());
-        verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
+        when(groupRepository.findByNumber(anyInt())).thenReturn(group);
+        List<StudentDto> studentsFromDb = service.createNewStudent(new StudentDto(0, "name", "lastName", 1));
         assertFalse(studentsFromDb.isEmpty());
-        assertEquals("Vasya", studentsFromDb.get(0).getFirstName());
+        assertEquals("name", studentsFromDb.get(0).getFirstName());
     }
 
     @Test
-    void shouldThrownAlreadyExistExceptionIfExistWhenCreateNewStudent() throws AlreadyExistException {
-        ExampleMatcher nameMatcher = ExampleMatcher.matching()
-                .withIgnorePaths("id")
-                .withMatcher("firstName", ignoreCase())
-                .withMatcher("lastName", ignoreCase());
-        Example<Student> example = Example.of(new Student(), nameMatcher);
-        when(repository.exists(example)).thenReturn(true);
-
+    void shouldThrownWrongInputDataExceptionIfExistWhenNameIsEmpty() {
         try {
-            service.createNewStudent(new StudentDto());
+            service.createNewStudent(new StudentDto(0, "", "lastName", 1));
             fail();
-        } catch (AlreadyExistException e) {
-            assertNotEquals("", e.getMessage());
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
         }
-        verify(repository, times(1)).exists(example);
-        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    void shouldReturnEditedStudentAfterEdit() throws NotExistException {
-        Student editedStudent = new Student(1L, "Vasya", "Petrov", new Schedule());
-        StudentDto studentForEdit = new StudentDto(1L, "Vasilii", "Petrov", 1L);
+    void shouldThrownAlreadyExistExceptionIfExistWhenNameLengthMoreThanTwentyFiveChar() {
+        try {
+            service.createNewStudent(new StudentDto(0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg", "lastName", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldThrownAlreadyExistExceptionIfExistWhenLastNameIsEmpty() {
+        try {
+            service.createNewStudent(new StudentDto(0, "name", "", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldThrownAlreadyExistExceptionIfExistWhenLastNameMoreThanFiftyCharacters() {
+        try {
+            service.createNewStudent(new StudentDto(0, "name", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldReturnEditedStudentAfterEdit() throws Exception {
+        Group group = new Group(1L, 1, new ArrayList<>(), new ArrayList<>(), new Schedule());
+        Student editedStudent = new Student(1L, "name", "lastname", group);
+        StudentDto studentForEdit = new StudentDto(1L, "Vasilii", "Petrov", 1);
         when(repository.findById(anyLong())).thenReturn(Optional.of(editedStudent));
         when(repository.save(editedStudent)).thenReturn(editedStudent);
+        when(groupRepository.findByNumber(anyInt())).thenReturn(group);
         StudentDto studentFromDb = service.editStudent(studentForEdit);
-        verify(repository, times(1)).findById(anyLong());
-        verify(repository, times(1)).save(editedStudent);
-        verifyNoMoreInteractions(repository);
         assertNotNull(studentFromDb);
         assertEquals("Vasilii", studentFromDb.getFirstName());
     }
 
     @Test
-    void shouldThrownAnNotExistExceptionWhenEditIfThereIsNoStudent() {
+    void shouldThrownAnNotExistExceptionWhenEditIfNoStudent() {
         try {
-            service.editStudent(new StudentDto());
+            service.editStudent(new StudentDto(1L, "Vasilii", "Petrov", 1));
             fail();
-        } catch (NotExistException e) {
-            assertNotEquals("", e.getMessage());
+        } catch (Exception e) {
+            assertTrue(e instanceof NotExistException);
+            assertTrue(e.getMessage().contains("Student"));
         }
-        verify(repository, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenEditIfExistIfNameIsEmpty() {
+        try {
+            service.editStudent(new StudentDto(0, "", "lastName", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenEditIfExistIfNameLengthMoreThanTwentyFiveChar() {
+        try {
+            service.createNewStudent(new StudentDto(0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg", "lastName", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenEditIfExistIfLastNameIsEmpty() {
+        try {
+            service.createNewStudent(new StudentDto(0, "name", "", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenEditIfExistIfLastNameMoreThanFiftyCharacters() {
+        try {
+            service.createNewStudent(new StudentDto(0, "name", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", 1));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("name"));
+        }
     }
 
     @Test
     void shouldReturnStringAfterRemove() throws NotExistException {
         when(repository.existsById(anyLong())).thenReturn(true);
         String response = service.removeStudent(anyLong());
-        verify(repository, times(1)).existsById(anyLong());
-        verify(repository, times(1)).deleteById(anyLong());
-        verifyNoMoreInteractions(repository);
-        assertNotEquals("", response);
+        assertTrue(response.contains("success"));
     }
 
     @Test
@@ -130,9 +189,7 @@ public class StudentServiceTest {
         try {
             service.removeStudent(anyLong());
         } catch (NotExistException e) {
-            assertNotEquals("", e.getMessage());
+            assertTrue(e.getMessage().contains("Student"));
         }
-        verify(repository, times(1)).existsById(anyLong());
-        verifyNoMoreInteractions(repository);
     }
 }

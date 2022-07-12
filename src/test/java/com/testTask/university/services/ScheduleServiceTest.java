@@ -1,33 +1,27 @@
 package com.testTask.university.services;
 
+import com.testTask.university.dao.GroupRepository;
+import com.testTask.university.dao.LectureRepository;
 import com.testTask.university.dao.ScheduleRepository;
 import com.testTask.university.dao.StudentRepository;
-import com.testTask.university.dto.LectureDto;
 import com.testTask.university.dto.ScheduleDto;
-import com.testTask.university.entity.Lecture;
-import com.testTask.university.entity.Schedule;
-import com.testTask.university.entity.Student;
+import com.testTask.university.entity.*;
 import com.testTask.university.exceptions.AlreadyExistException;
 import com.testTask.university.exceptions.NotExistException;
+import com.testTask.university.exceptions.WrongInputDataException;
 import com.testTask.university.service.ScheduleService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
 @SpringBootTest
 
@@ -41,20 +35,22 @@ public class ScheduleServiceTest {
     @MockBean
     private StudentRepository studentRepository;
 
+    @MockBean
+    private LectureRepository lectureRepository;
+
+    @MockBean
+    private GroupRepository groupRepository;
+
     @Test
     void shouldReturnListWithSchedules() {
         List<Schedule> schedules = new ArrayList<>();
-        schedules.add(new Schedule(1L, "schedule1", new ArrayList<>()));
-        schedules.add(new Schedule(2L, "schedule2"));
-        schedules.add(new Schedule(3L, "schedule3"));
-        schedules.add(new Schedule(4L, "schedule4"));
-
+        schedules.add(new Schedule(1L, "2022-07-15", new Group()));
+        schedules.add(new Schedule(2L, "2022-07-15", new Group()));
+        schedules.add(new Schedule(3L, "2022-07-15", new Group()));
+        schedules.add(new Schedule(4L, "2022-07-15", new Group()));
         when(repository.findAll()).thenReturn(schedules);
         List<ScheduleDto> schedulesFromDb = service.getAllSchedules();
-        verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
         assertEquals(4, schedulesFromDb.size());
-        assertEquals("schedule4", schedulesFromDb.get(3).getName());
     }
 
     @Test
@@ -62,96 +58,111 @@ public class ScheduleServiceTest {
         List<Schedule> schedules = new ArrayList<>();
         when(repository.findAll()).thenReturn(schedules);
         List<ScheduleDto> lecturesFromDb = service.getAllSchedules();
-        verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
         assertTrue(lecturesFromDb.isEmpty());
     }
 
     @Test
-    void shouldReturnScheduleIfStudentExist() throws NotExistException {
+    void shouldReturnScheduleIfStudentExist() throws Exception {
         List<Lecture> lectures = new ArrayList<>();
-        lectures.add(new Lecture(1L, "lecture1", new Date()));
-        lectures.add(new Lecture(2L, "lecture2", new Date()));
-        Schedule schedule = new Schedule(1L, "schedule1", lectures);
-        Student student = new Student(1L, "Igor", "Zagorka", schedule);
+        lectures.add(new Lecture(1L, "lecture1", "2022-07-12", new Audience(), new Group()));
+        lectures.add(new Lecture(2L, "lecture2", "2022-07-12", new Audience(), new Group()));
+        Schedule schedule = new Schedule(1L, "2022-07-15", new Group());
+        Group group = new Group(1L, 1, new ArrayList<>(), new ArrayList<>(), new Schedule());
+        Student student = new Student(1L, "name", "lastname", group);
         when(studentRepository.findById(anyLong())).thenReturn(Optional.of(student));
-        ScheduleDto scheduleFromDb = service.getStudentSchedule(anyLong());
-        verify(studentRepository, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(studentRepository);
+        when(repository.findByGroup_IdAndDate(anyLong(), anyString())).thenReturn(schedule);
+        when(lectureRepository.findAllByGroup_NumberAndAndDate(anyInt(), anyString())).thenReturn(lectures);
+        ScheduleDto scheduleFromDb = service.getStudentSchedule(anyLong(), "2022-07-15");
         assertNotNull(scheduleFromDb);
-        assertEquals("schedule1", scheduleFromDb.getName());
         assertEquals("lecture1", scheduleFromDb.getLectures().get(0).getLectureName());
     }
 
     @Test
-    void shouldReturnAllSchedulesAfterCreateNew() throws AlreadyExistException {
-        List<LectureDto> lectures = new ArrayList<>();
-        lectures.add(new LectureDto(1L, "lecture1", new Date()));
-        lectures.add(new LectureDto(2L, "lecture2", new Date()));
-        Schedule schedule = new Schedule(1L, "schedule1", new ArrayList<>());
-        ScheduleDto scheduleDto = new ScheduleDto(1L, "schedule1", lectures);
-        List<Schedule> list = new ArrayList<>();
-        list.add(schedule);
-        when(repository.findAll()).thenReturn(list);
-        List<ScheduleDto> schedules = service.createNewSchedule(scheduleDto);
-        verify(repository, times(1)).save(new Schedule());
-        verify(repository, times(1)).findAll();
-        verifyNoMoreInteractions(repository);
-        assertFalse(schedules.isEmpty());
+    void shouldReturnNotExistExceptionIfStudentNotExist() {
+        try {
+            service.getStudentSchedule(1L, "2022-07-15");
+        } catch (Exception e) {
+            assertTrue(e instanceof NotExistException);
+            assertTrue(e.getMessage().contains("Student"));
+        }
     }
 
     @Test
-    void shouldThrownAlreadyExistExceptionIfExistWhenCreateNewSchedule() throws AlreadyExistException {
-        ExampleMatcher nameMatcher = ExampleMatcher.matching()
-                .withIgnorePaths("id")
-                .withMatcher("name", ignoreCase());
-        Example<Schedule> example = Example.of(new Schedule(), nameMatcher);
-        when(repository.exists(example)).thenReturn(true);
+    void shouldReturnAllSchedulesAfterCreateNew() throws Exception {
+        Schedule schedule = new Schedule(1L, "2022-07-15", new Group());
+        ScheduleDto scheduleDto = new ScheduleDto(1L, "2022-07-15", 1, new ArrayList<>());
+        List<Schedule> list = new ArrayList<>();
+        list.add(schedule);
+        when(repository.findAll()).thenReturn(list);
+        when(groupRepository.findByNumber(anyInt())).thenReturn(new Group());
+        List<ScheduleDto> schedules = service.createNewSchedule(scheduleDto);
+        assertFalse(schedules.isEmpty());
+        assertEquals("2022-07-15", schedules.get(0).getDate());
+    }
 
+    @Test
+    void shouldThrownAlreadyExistExceptionIfExistWhenCreateNewSchedule() {
+        when(groupRepository.findByNumber(anyInt())).thenReturn(new Group());
+        when(repository.findByGroup_NumberAndDate(anyInt(), anyString())).thenReturn(new Schedule());
         try {
-            service.createNewSchedule(new ScheduleDto());
+            service.createNewSchedule(new ScheduleDto(1L, "2022-07-15", 1, new ArrayList<>()));
             fail();
-        } catch (AlreadyExistException e) {
+        } catch (Exception e) {
+            assertTrue(e instanceof AlreadyExistException);
             assertNotEquals("", e.getMessage());
         }
-        verify(repository, times(1)).exists(example);
-        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenCreateNewScheduleIfWrongDate() {
+        try {
+            service.createNewSchedule(new ScheduleDto(1L, "2022-07-155", 1, new ArrayList<>()));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("date"));
+        }
+    }
+
+    @Test
+    void shouldThrownWrongInputDataExceptionWhenCreateNewScheduleIfWrongGroupNumber() {
+        try {
+            service.createNewSchedule(new ScheduleDto(1L, "2022-07-15", -1, new ArrayList<>()));
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof WrongInputDataException);
+            assertTrue(e.getMessage().contains("group"));
+        }
     }
 
     @Test
     void shouldReturnEditedScheduleAfterEdit() throws NotExistException {
-        Schedule editedSchedule = new Schedule(1L, "schedule1", new ArrayList<>());
-        ScheduleDto scheduleForEdit = new ScheduleDto(1L, "schedule2", new ArrayList<>());
-        when(repository.findById(anyLong())).thenReturn(Optional.of(editedSchedule));
+        when(groupRepository.findByNumber(anyInt())).thenReturn(new Group());
+        Schedule editedSchedule = new Schedule(1L, "2022-07-15", new Group());
+        ScheduleDto scheduleToEdit = new ScheduleDto(1L, "2022-07-25", 1, new ArrayList<>());
         when(repository.save(editedSchedule)).thenReturn(editedSchedule);
-        ScheduleDto scheduleFromDb = service.editSchedule(scheduleForEdit);
-        verify(repository, times(1)).findById(anyLong());
-        verify(repository, times(1)).save(editedSchedule);
-        verifyNoMoreInteractions(repository);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(editedSchedule));
+        ScheduleDto scheduleFromDb = service.editSchedule(scheduleToEdit);
         assertNotNull(scheduleFromDb);
-        assertEquals("schedule2", scheduleFromDb.getName());
+        assertEquals("2022-07-25", scheduleFromDb.getDate());
     }
 
     @Test
-    void shouldThrownAnNotExistExceptionIfThereIsNoLecture() {
+    void shouldThrownAnNotExistExceptionIfThereIsNoScheduleWhenEdit() {
         try {
-            service.editSchedule(new ScheduleDto());
+            service.editSchedule(new ScheduleDto(1L, "2022-07-25", 1, new ArrayList<>()));
             fail();
         } catch (NotExistException e) {
-            assertNotEquals("", e.getMessage());
+            System.out.println(e.getMessage());
+            assertTrue(e.getMessage().contains("Schedule"));
         }
-        verify(repository, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(repository);
     }
 
     @Test
     void shouldReturnStringAfterRemove() throws NotExistException {
         when(repository.existsById(anyLong())).thenReturn(true);
         String response = service.removeSchedule(anyLong());
-        verify(repository, times(1)).existsById(anyLong());
-        verify(repository, times(1)).deleteById(anyLong());
-        verifyNoMoreInteractions(repository);
-        assertNotEquals("", response);
+        assertTrue(response.contains("success"));
     }
 
     @Test
@@ -160,9 +171,7 @@ public class ScheduleServiceTest {
         try {
             service.removeSchedule(anyLong());
         } catch (NotExistException e) {
-            assertNotEquals("", e.getMessage());
+            assertTrue(e.getMessage().contains("Schedule"));
         }
-        verify(repository, times(1)).existsById(anyLong());
-        verifyNoMoreInteractions(repository);
     }
 }

@@ -1,21 +1,16 @@
 package com.testTask.university.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "lecture")
-@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,30 +23,35 @@ public class Lecture {
     @Column
     private String date;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "lectures")
-    private List<Audience> audiences;
+    @ManyToOne
+    @JoinColumn(name="audience_id")
+    private Audience audience;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "lectures")
-    private List<Group> groups;
+    @ManyToOne
+    @JoinColumn(name="group_id")
+    private Group group;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lecture lecture = (Lecture) o;
-        return name.equals(lecture.name) && date.equals(lecture.date);
+        return name.equals(lecture.name) && date.equals(lecture.date) && Objects.equals(audience, lecture.audience) && Objects.equals(group, lecture.group);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, date);
+        return Objects.hash(name, date, audience, group);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "name = " + name + ", " +
-                "date = " + date + ")";
+        return "Lecture{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", date='" + date + '\'' +
+                ", audience=" + audience +
+                ", group=" + group +
+                '}';
     }
 }

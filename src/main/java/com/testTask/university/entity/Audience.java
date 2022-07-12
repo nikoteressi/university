@@ -2,13 +2,17 @@ package com.testTask.university.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -24,10 +28,7 @@ public class Audience {
     @Column
     private int number;
 
-    @ManyToMany
-    @JoinTable(name = "lectures_audiences"
-            , joinColumns = @JoinColumn(name = "audience_id"),
-            inverseJoinColumns = @JoinColumn(name = "lecture_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "audience")
     private List<Lecture> lectures;
 
     @Override

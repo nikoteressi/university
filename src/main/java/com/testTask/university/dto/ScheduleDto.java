@@ -14,6 +14,6 @@ import java.util.List;
 public class ScheduleDto {
     private long scheduleId;
     private String date;
-    private long group_id;
+    private int groupNumber;
     private List<LectureDto> lectures;
 }

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AudienceRepository extends JpaRepository<Audience, Long> {
+    boolean existsByNumber(int number);
+    Audience findByNumber(int number);
 }
