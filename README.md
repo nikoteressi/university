@@ -1,5 +1,5 @@
 
-# University REST API
+# University REST API  (Test task for company Elinext)
 
 ### TODO
 
