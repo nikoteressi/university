@@ -45,7 +45,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDto getStudentSchedule(long studentId, String date) throws Exception {
+    public ScheduleDto getStudentSchedule(long studentId, String date) {
         fieldValidator.validateDate(date);
         Student student = findStudentById(studentId);
         Schedule scheduleFromDb = scheduleRepository.findByGroup_IdAndDate(student.getGroup().getId(), date);
@@ -60,7 +60,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Transactional
     @Override
-    public List<ScheduleDto> createNewSchedule(ScheduleDto schedule) throws Exception {
+    public List<ScheduleDto> createNewSchedule(ScheduleDto schedule) {
         fieldValidator.validateDate(schedule.getDate());
         fieldValidator.validateGroupNumber(schedule.getGroupNumber());
         checkIfExistByGroupNumberAndDate(schedule);
@@ -70,15 +70,18 @@ public class ScheduleServiceImpl implements ScheduleService {
         return getAllSchedules();
     }
 
-    private void checkIfExistByGroupNumberAndDate(ScheduleDto schedule) throws AlreadyExistException {
+    private void checkIfExistByGroupNumberAndDate(ScheduleDto schedule) {
         Schedule scheduleFromDb = scheduleRepository.findByGroup_NumberAndDate(schedule.getGroupNumber(), schedule.getDate());
         if (scheduleFromDb != null)
-            throw  new AlreadyExistException("The schedule for group '" + schedule.getGroupNumber() + "' and for date '" + schedule.getDate() + "' already exists.");
+            throw new AlreadyExistException("The schedule for group '" + schedule.getGroupNumber()
+                    + "' and for date '" + schedule.getDate() + "' already exists.");
     }
 
     @Transactional
     @Override
-    public ScheduleDto editSchedule(ScheduleDto schedule) throws NotExistException {
+    public ScheduleDto editSchedule(ScheduleDto schedule) {
+        fieldValidator.validateDate(schedule.getDate());
+        fieldValidator.validateGroupNumber(schedule.getGroupNumber());
         Schedule scheduleFromDb = findScheduleById(schedule);
         Schedule editedSchedule = scheduleMapper.convertToEntity(schedule);
         scheduleFromDb.setId(editedSchedule.getId());
@@ -89,7 +92,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Transactional
     @Override
-    public String removeSchedule(long scheduleId) throws NotExistException {
+    public String removeSchedule(long scheduleId) {
         if (!scheduleRepository.existsById(scheduleId))
             throw new NotExistException("Schedule with ID: " + scheduleId + " not found.");
         scheduleRepository.deleteById(scheduleId);
@@ -108,21 +111,21 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    private Group findGroupByNumber(ScheduleDto schedule) throws NotExistException {
+    private Group findGroupByNumber(ScheduleDto schedule) {
         Group group = groupRepository.findByNumber(schedule.getGroupNumber());
         if (group == null)
-            throw new NotExistException("Group with number '" + schedule.getScheduleId() + "' not found.");
+            throw new NotExistException("Group with number '" + schedule.getGroupNumber() + "' not found.");
         return group;
     }
 
-    private Student findStudentById(long studentId) throws NotExistException {
+    private Student findStudentById(long studentId) {
         Student student = studentRepository.findById(studentId).orElse(null);
         if (student == null)
             throw new NotExistException("Student with ID: " + studentId + " not found.");
         return student;
     }
 
-    private Schedule findScheduleById(ScheduleDto schedule) throws NotExistException {
+    private Schedule findScheduleById(ScheduleDto schedule) {
         Schedule scheduleFromDb = scheduleRepository.findById(schedule.getScheduleId()).orElse(null);
         if (scheduleFromDb == null)
             throw new NotExistException("Schedule with ID: " + schedule.getScheduleId() + " not found.");

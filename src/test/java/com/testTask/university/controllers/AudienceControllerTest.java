@@ -64,7 +64,7 @@ public class AudienceControllerTest {
     }
 
     @Test
-    public void shouldReturnAlreadyExistWhenCreateNewIfExist() throws Exception {
+    public void shouldReturnConflictStatusWhenCreateNewIfExist() throws Exception {
         AudienceDto audienceDto = new AudienceDto(1L, 12);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
         mockMvc.perform(post("/api/audience/new-audience")
@@ -93,7 +93,7 @@ public class AudienceControllerTest {
     }
 
     @Test
-    public void shouldReturnStatusNotFoundAndMessageWhenUpdateIfNotExist() throws Exception {
+    public void shouldReturnNotFoundStatusAndMessageWhenUpdateIfNotExist() throws Exception {
         AudienceDto audienceDto = new AudienceDto(1L, 12);
         mockMvc.perform(put("/api/audience/edit-audience")
                         .content(objectMapper.writeValueAsString(audienceDto))
@@ -117,7 +117,7 @@ public class AudienceControllerTest {
     }
 
     @Test
-    public void shouldReturnErrorCodeNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
+    public void shouldReturnNotFoundStatusAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
         mockMvc.perform(delete("/api/audience/remove-audience")
                         .param("audienceId", String.valueOf(anyLong())))

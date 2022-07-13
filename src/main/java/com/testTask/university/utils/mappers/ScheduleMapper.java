@@ -5,11 +5,9 @@ import com.testTask.university.entity.Schedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @RequiredArgsConstructor
 public class ScheduleMapper {
-
 
     public ScheduleDto convertToDto(Schedule schedule) {
         return ScheduleDto.builder()
@@ -19,7 +17,7 @@ public class ScheduleMapper {
                 .build();
     }
 
-    public Schedule convertToEntity(ScheduleDto scheduleDto){
+    public Schedule convertToEntity(ScheduleDto scheduleDto) {
         Schedule schedule = new Schedule();
         schedule.setId(scheduleDto.getScheduleId());
         schedule.setDate(scheduleDto.getDate());

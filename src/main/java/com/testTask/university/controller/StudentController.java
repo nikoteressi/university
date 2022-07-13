@@ -20,17 +20,17 @@ public class StudentController {
     }
 
     @PostMapping("/new-student")
-    public List<StudentDto> createStudent(@RequestBody StudentDto student) throws Exception {
+    public List<StudentDto> createStudent(@RequestBody StudentDto student) {
         return service.createNewStudent(student);
     }
 
     @PutMapping("/edit-student")
-    public StudentDto editStudent(@RequestBody StudentDto student) throws Exception {
+    public StudentDto editStudent(@RequestBody StudentDto student) {
         return service.editStudent(student);
     }
 
     @DeleteMapping("/remove-student")
-    public String removeStudent(@RequestParam long studentId) throws Exception {
+    public String removeStudent(@RequestParam long studentId) {
         return service.removeStudent(studentId);
     }
 }

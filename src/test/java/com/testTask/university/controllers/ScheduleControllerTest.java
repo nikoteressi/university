@@ -159,7 +159,7 @@ public class ScheduleControllerTest {
     }
 
     @Test
-    public void shouldReturnErrorCodeNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
+    public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
         mockMvc.perform(delete("/api//schedule/remove-schedule")
                         .param("scheduleId", String.valueOf(anyLong())))
@@ -169,6 +169,4 @@ public class ScheduleControllerTest {
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }
-
-
 }

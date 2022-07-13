@@ -24,11 +24,11 @@ public class Lecture {
     private String date;
 
     @ManyToOne
-    @JoinColumn(name="audience_id")
+    @JoinColumn(name = "audience_id")
     private Audience audience;
 
     @ManyToOne
-    @JoinColumn(name="group_id")
+    @JoinColumn(name = "group_id")
     private Group group;
 
     @Override
@@ -36,7 +36,10 @@ public class Lecture {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lecture lecture = (Lecture) o;
-        return name.equals(lecture.name) && date.equals(lecture.date) && Objects.equals(audience, lecture.audience) && Objects.equals(group, lecture.group);
+        return name.equals(lecture.name)
+                && date.equals(lecture.date)
+                && Objects.equals(audience, lecture.audience)
+                && Objects.equals(group, lecture.group);
     }
 
     @Override

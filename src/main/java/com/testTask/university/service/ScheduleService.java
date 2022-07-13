@@ -8,11 +8,11 @@ import java.util.List;
 public interface ScheduleService {
     List<ScheduleDto> getAllSchedules();
 
-    ScheduleDto getStudentSchedule(long studentId, String date) throws Exception;
+    ScheduleDto getStudentSchedule(long studentId, String date);
 
-    List<ScheduleDto> createNewSchedule(ScheduleDto schedule) throws Exception;
+    List<ScheduleDto> createNewSchedule(ScheduleDto schedule);
 
-    ScheduleDto editSchedule(ScheduleDto schedule) throws NotExistException;
+    ScheduleDto editSchedule(ScheduleDto schedule);
 
-    String removeSchedule(long scheduleId) throws NotExistException;
+    String removeSchedule(long scheduleId);
 }

@@ -21,22 +21,23 @@ public class ScheduleController {
     }
 
     @GetMapping("/student-schedule")
-    public ScheduleDto getStudentSchedule(@RequestParam("studentId") long studentId, @RequestParam("scheduleDate") String scheduleDate) throws Exception {
+    public ScheduleDto getStudentSchedule(@RequestParam("studentId") long studentId,
+                                          @RequestParam("scheduleDate") String scheduleDate) {
         return scheduleService.getStudentSchedule(studentId, scheduleDate);
     }
 
     @PostMapping("/new-schedule")
-    public List<ScheduleDto> addSchedule(@RequestBody ScheduleDto schedule) throws Exception {
+    public List<ScheduleDto> addSchedule(@RequestBody ScheduleDto schedule) {
         return scheduleService.createNewSchedule(schedule);
     }
 
     @PutMapping("/edit-schedule")
-    public ScheduleDto editSchedule(@RequestBody ScheduleDto schedule) throws NotExistException {
+    public ScheduleDto editSchedule(@RequestBody ScheduleDto schedule) {
         return scheduleService.editSchedule(schedule);
     }
 
     @DeleteMapping("/remove-schedule")
-    public String removeSchedule(@RequestParam long scheduleId) throws NotExistException {
+    public String removeSchedule(@RequestParam long scheduleId) {
         return scheduleService.removeSchedule(scheduleId);
     }
 }

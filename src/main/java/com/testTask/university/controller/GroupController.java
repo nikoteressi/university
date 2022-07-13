@@ -20,17 +20,17 @@ public class GroupController {
     }
 
     @PostMapping("/new-group")
-    public List<GroupDto> createGroup(@RequestBody GroupDto group) throws Exception {
+    public List<GroupDto> createGroup(@RequestBody GroupDto group) {
         return service.createNewGroup(group);
     }
 
     @PutMapping("/edit-group")
-    public GroupDto editGroup(@RequestBody GroupDto group) throws Exception {
+    public GroupDto editGroup(@RequestBody GroupDto group) {
         return service.editGroup(group);
     }
 
     @DeleteMapping("/remove-group")
-    public String removeGroup(@RequestParam long groupId) throws Exception {
+    public String removeGroup(@RequestParam long groupId) {
         return service.removeGroup(groupId);
     }
 }

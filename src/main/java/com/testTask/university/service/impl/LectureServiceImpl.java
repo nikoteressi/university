@@ -39,7 +39,7 @@ public class LectureServiceImpl implements LectureService {
 
     @Transactional
     @Override
-    public List<LectureDto> createNewLecture(LectureDto lecture) throws Exception {
+    public List<LectureDto> createNewLecture(LectureDto lecture) {
         fieldValidator.validateCreateOrUpdateLecture(lecture);
         checkIfExistByNameAndDate(lecture.getLectureName(), lecture.getLectureDate());
         repository.save(setLectureFieldsToSave(lecture));
@@ -48,7 +48,7 @@ public class LectureServiceImpl implements LectureService {
 
     @Transactional
     @Override
-    public LectureDto editLecture(LectureDto lecture) throws Exception {
+    public LectureDto editLecture(LectureDto lecture) {
         fieldValidator.validateCreateOrUpdateLecture(lecture);
         Lecture lectureFromDb = findLectureById(lecture.getLectureId());
         updateLectureFields(lecture, lectureFromDb);
@@ -57,18 +57,18 @@ public class LectureServiceImpl implements LectureService {
 
     @Transactional
     @Override
-    public String removeLecture(long lectureId) throws NotExistException {
+    public String removeLecture(long lectureId) {
         checkIfExistToRemove(lectureId);
         repository.deleteById(lectureId);
         return "Lecture with ID '" + lectureId + "' has been successfully deleted.";
     }
 
-    private void checkIfExistToRemove(long lectureId) throws NotExistException {
+    private void checkIfExistToRemove(long lectureId) {
         if (!repository.existsById(lectureId))
             throw new NotExistException("Lecture with ID '" + lectureId + "' not exist.");
     }
 
-    private Lecture setLectureFieldsToSave(LectureDto lecture) throws NotExistException {
+    private Lecture setLectureFieldsToSave(LectureDto lecture) {
         Lecture lectureToSave = mapper.convertToEntity(lecture);
         lectureToSave.setGroup(getGroupByNumber(lecture.getGroupNumber()));
         lectureToSave.setAudience(getAudienceByNumber(lecture.getAudienceNumber()));

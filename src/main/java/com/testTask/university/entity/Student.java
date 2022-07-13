@@ -1,7 +1,5 @@
 package com.testTask.university.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "student")
-@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +35,9 @@ public class Student {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return firstName.equals(student.firstName) && lastName.equals(student.lastName) && Objects.equals(group, student.group);
+        return firstName.equals(student.firstName)
+                && lastName.equals(student.lastName)
+                && Objects.equals(group, student.group);
     }
 
     @Override

@@ -39,8 +39,9 @@ public class StudentServiceTest {
         students.add(new Student(1L, "name", "lastname", new Group()));
         when(repository.findAll()).thenReturn(students);
         List<StudentDto> studentsFromDb = service.getAllStudents();
-        verify(repository, times(1)).findAll();
         assertEquals(1, studentsFromDb.size());
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -49,19 +50,28 @@ public class StudentServiceTest {
         when(repository.findAll()).thenReturn(students);
         List<StudentDto> studentsFromDb = service.getAllStudents();
         assertTrue(studentsFromDb.isEmpty());
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    void shouldReturnAllStudentsAfterCreateNew() throws Exception {
+    void shouldReturnAllStudentsAfterCreateNew() {
         Group group = new Group(1L, 1, new ArrayList<>(), new ArrayList<>(), new Schedule());
-        Student student = new Student(1L, "name", "lastname", group);
+        Student student = new Student(0, "name", "lastname", group);
+        StudentDto studentDto = new StudentDto(0, "name", "lastname", 1);
         List<Student> list = new ArrayList<>();
         list.add(student);
         when(repository.findAll()).thenReturn(list);
         when(groupRepository.findByNumber(anyInt())).thenReturn(group);
-        List<StudentDto> studentsFromDb = service.createNewStudent(new StudentDto(0, "name", "lastName", 1));
+        when(repository.save(student)).thenReturn(student);
+        List<StudentDto> studentsFromDb = service.createNewStudent(studentDto);
         assertFalse(studentsFromDb.isEmpty());
         assertEquals("name", studentsFromDb.get(0).getFirstName());
+        verify(repository, times(1)).findAll();
+        verify(repository, times(1)).save(student);
+        verify(groupRepository, times(1)).findByNumber(anyInt());
+        verifyNoMoreInteractions(repository);
+        verifyNoMoreInteractions(groupRepository);
     }
 
     @Test
@@ -73,17 +83,22 @@ public class StudentServiceTest {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
     void shouldThrownAlreadyExistExceptionIfExistWhenNameLengthMoreThanTwentyFiveChar() {
         try {
-            service.createNewStudent(new StudentDto(0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg", "lastName", 1));
+            service.createNewStudent(new StudentDto(0,
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg",
+                    "lastName",
+                    1));
             fail();
         } catch (Exception e) {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
@@ -95,21 +110,25 @@ public class StudentServiceTest {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
     void shouldThrownAlreadyExistExceptionIfExistWhenLastNameMoreThanFiftyCharacters() {
         try {
-            service.createNewStudent(new StudentDto(0, "name", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", 1));
+            service.createNewStudent(new StudentDto(0, "name",
+                    "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+                    1));
             fail();
         } catch (Exception e) {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
-    void shouldReturnEditedStudentAfterEdit() throws Exception {
+    void shouldReturnEditedStudentAfterEdit() {
         Group group = new Group(1L, 1, new ArrayList<>(), new ArrayList<>(), new Schedule());
         Student editedStudent = new Student(1L, "name", "lastname", group);
         StudentDto studentForEdit = new StudentDto(1L, "Vasilii", "Petrov", 1);
@@ -119,6 +138,11 @@ public class StudentServiceTest {
         StudentDto studentFromDb = service.editStudent(studentForEdit);
         assertNotNull(studentFromDb);
         assertEquals("Vasilii", studentFromDb.getFirstName());
+        verify(repository, times(1)).findById(anyLong());
+        verify(repository, times(1)).save(editedStudent);
+        verify(groupRepository, times(1)).findByNumber(anyInt());
+        verifyNoMoreInteractions(repository);
+        verifyNoMoreInteractions(groupRepository);
     }
 
     @Test
@@ -130,6 +154,7 @@ public class StudentServiceTest {
             assertTrue(e instanceof NotExistException);
             assertTrue(e.getMessage().contains("Student"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
@@ -141,17 +166,21 @@ public class StudentServiceTest {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
     void shouldThrownWrongInputDataExceptionWhenEditIfExistIfNameLengthMoreThanTwentyFiveChar() {
         try {
-            service.createNewStudent(new StudentDto(0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg", "lastName", 1));
+            service.createNewStudent(new StudentDto(0,
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaffgdfgfddgdfgfg",
+                    "lastName", 1));
             fail();
         } catch (Exception e) {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
@@ -163,17 +192,21 @@ public class StudentServiceTest {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
     void shouldThrownWrongInputDataExceptionWhenEditIfExistIfLastNameMoreThanFiftyCharacters() {
         try {
-            service.createNewStudent(new StudentDto(0, "name", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", 1));
+            service.createNewStudent(new StudentDto(0, "name",
+                    "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+                    1));
             fail();
         } catch (Exception e) {
             assertTrue(e instanceof WrongInputDataException);
             assertTrue(e.getMessage().contains("name"));
         }
+        verifyNoInteractions(repository);
     }
 
     @Test
@@ -181,6 +214,9 @@ public class StudentServiceTest {
         when(repository.existsById(anyLong())).thenReturn(true);
         String response = service.removeStudent(anyLong());
         assertTrue(response.contains("success"));
+        verify(repository, times(1)).existsById(anyLong());
+        verify(repository, times(1)).deleteById(anyLong());
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -191,5 +227,7 @@ public class StudentServiceTest {
         } catch (NotExistException e) {
             assertTrue(e.getMessage().contains("Student"));
         }
+        verify(repository, times(1)).existsById(anyLong());
+        verifyNoMoreInteractions(repository);
     }
 }

@@ -1,7 +1,5 @@
 package com.testTask.university.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "audience")
-@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Audience {
 
     @Id

@@ -82,7 +82,7 @@ public class LectureControllerTest {
     }
 
     @Test
-    public void shouldReturnAlreadyExistWhenCreateNewIfExist() throws Exception {
+    public void shouldReturnAlreadyExistStatusWhenCreateNewIfExist() throws Exception {
         LectureDto lectureDto = new LectureDto(1L,  "name2", "2022-09-23", 12, 25);
         Lecture lecture = new Lecture(1L, "name", "2022-11-23", new Audience(), new Group());
         when(repository.findByNameAndDate(anyString(), anyString())).thenReturn(lecture);
@@ -141,7 +141,7 @@ public class LectureControllerTest {
     }
 
     @Test
-    public void shouldReturnErrorCodeNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
+    public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
         mockMvc.perform(delete("/api/lecture/remove-lecture")
                         .param("lectureId", String.valueOf(anyLong())))

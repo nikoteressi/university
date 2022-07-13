@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class AudienceServiceTest {
@@ -37,6 +37,8 @@ public class AudienceServiceTest {
         List<AudienceDto> audiencesFromDb = service.getAllAudiences();
         assertEquals(1, audiencesFromDb.size());
         assertEquals(1, audiences.get(0).getNumber());
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -45,6 +47,8 @@ public class AudienceServiceTest {
         when(repository.findAll()).thenReturn(audiences);
         List<AudienceDto> audiencesFromDb = service.getAllAudiences();
         assertTrue(audiencesFromDb.isEmpty());
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -58,6 +62,8 @@ public class AudienceServiceTest {
             assertTrue((e instanceof AlreadyExistException));
             assertTrue(e.getMessage().contains("audience"));
         }
+        verify(repository, times(1)).existsByNumber(anyInt());
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -70,10 +76,11 @@ public class AudienceServiceTest {
             assertTrue((e instanceof WrongInputDataException));
             assertTrue(e.getMessage().contains("audience"));
         }
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    void shouldReturnAllAudiencesAfterCreateNew() throws Exception {
+    void shouldReturnAllAudiencesAfterCreateNew() {
         Audience audience = new Audience(1L, 12, new ArrayList<>());
         AudienceDto audienceDto = new AudienceDto(0, 12);
         List<Audience> audiences = new ArrayList<>();
@@ -82,10 +89,14 @@ public class AudienceServiceTest {
         List<AudienceDto> audiencesFromDb = service.createNewAudience(audienceDto);
         assertFalse(audiencesFromDb.isEmpty());
         assertEquals(12, audiencesFromDb.get(0).getNumber());
+        verify(repository, times(1)).existsByNumber(anyInt());
+        verify(repository, times(1)).save(audience);
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    void shouldReturnEditedAudienceAfterEdit() throws Exception {
+    void shouldReturnEditedAudienceAfterEdit() {
         Audience audience = new Audience(1L, 12, new ArrayList<>());
         AudienceDto audienceDto = new AudienceDto(0, 12);
         when(repository.save(audience)).thenReturn(audience);
@@ -93,12 +104,15 @@ public class AudienceServiceTest {
         AudienceDto audienceFromDb = service.editAudience(audienceDto);
         assertNotNull(audienceFromDb);
         assertEquals(12, audienceFromDb.getNumber());
-
+        verify(repository, times(1)).findByNumber(anyInt());
+        verify(repository, times(1)).save(audience);
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
     void shouldThrownAnNotExistExceptionWhenEditIfThereIsNoAudience() {
         AudienceDto audienceDto = new AudienceDto(0, 12);
+        when(repository.existsByNumber(anyInt())).thenReturn(false);
         try {
             service.editAudience(audienceDto);
             fail();
@@ -106,13 +120,19 @@ public class AudienceServiceTest {
             assertTrue((e instanceof NotExistException));
             assertTrue(e.getMessage().contains("audience"));
         }
+        verify(repository, times(1)).findByNumber(anyInt());
+        verifyNoMoreInteractions(repository);
+
     }
 
     @Test
-    void shouldReturnStringAfterRemove() throws Exception {
+    void shouldReturnStringAfterRemove() {
         when(repository.existsById(anyLong())).thenReturn(true);
         String response = service.removeAudience(anyLong());
         assertTrue(response.contains("success"));
+        verify(repository, times(1)).existsById(anyLong());
+        verify(repository, times(1)).deleteById(anyLong());
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -124,5 +144,7 @@ public class AudienceServiceTest {
             assertTrue(e instanceof NotExistException);
             assertTrue(e.getMessage().contains("audience"));
         }
+        verify(repository, times(1)).existsById(anyLong());
+        verifyNoMoreInteractions(repository);
     }
 }

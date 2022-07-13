@@ -66,7 +66,7 @@ public class GroupControllerTest {
     }
 
     @Test
-    public void shouldReturnAlreadyExistWhenCreateNewIfExist() throws Exception {
+    public void shouldReturnAlreadyExistStatusWhenCreateNewIfExist() throws Exception {
         GroupDto groupDto = new GroupDto(1L,  12);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
         mockMvc.perform(post("/api/group/new-group")
@@ -119,7 +119,7 @@ public class GroupControllerTest {
     }
 
     @Test
-    public void shouldReturnErrorCodeNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
+    public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
         mockMvc.perform(delete("/api/group/remove-group")
                         .param("groupId", String.valueOf(anyLong())))

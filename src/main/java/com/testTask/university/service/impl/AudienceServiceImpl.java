@@ -32,7 +32,7 @@ public class AudienceServiceImpl implements AudienceService {
 
     @Transactional
     @Override
-    public List<AudienceDto> createNewAudience(AudienceDto audience) throws Exception {
+    public List<AudienceDto> createNewAudience(AudienceDto audience) {
         fieldValidator.validateAudienceNumber(audience.getNumber());
         checkIfExistByNumber(audience);
         repository.save(mapper.convertToEntity(audience));
@@ -41,7 +41,7 @@ public class AudienceServiceImpl implements AudienceService {
 
     @Transactional
     @Override
-    public AudienceDto editAudience(AudienceDto audience) throws Exception {
+    public AudienceDto editAudience(AudienceDto audience) {
         fieldValidator.validateAudienceNumber(audience.getNumber());
         Audience audienceFromDb = findAudienceByNumber(audience);
         Audience audienceToSave = mapper.convertToEntity(audience);
@@ -51,23 +51,23 @@ public class AudienceServiceImpl implements AudienceService {
 
     @Transactional
     @Override
-    public String removeAudience(long audienceId) throws Exception {
+    public String removeAudience(long audienceId) {
         checkIfExistToRemove(audienceId);
         repository.deleteById(audienceId);
         return "Audience with ID: " + audienceId + " has been successfully deleted.";
     }
 
-    private void checkIfExistByNumber(AudienceDto audience) throws AlreadyExistException {
+    private void checkIfExistByNumber(AudienceDto audience) {
         if (repository.existsByNumber(audience.getNumber()))
             throw new AlreadyExistException("The audience with number '" + audience.getNumber() + "' already exist.");
     }
 
-    private void checkIfExistToRemove(long id) throws NotExistException {
+    private void checkIfExistToRemove(long id) {
         if (!repository.existsById(id))
             throw new NotExistException("The audience with id '" + id + "' not exist.");
     }
 
-    private Audience findAudienceByNumber(AudienceDto audience) throws NotExistException {
+    private Audience findAudienceByNumber(AudienceDto audience) {
         Audience audienceFromDb = repository.findByNumber(audience.getNumber());
         if (audienceFromDb == null)
             throw new NotExistException("The audience with number '" + audience.getNumber() + "' not exist.");

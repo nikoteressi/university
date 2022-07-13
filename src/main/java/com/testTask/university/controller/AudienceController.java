@@ -20,17 +20,17 @@ public class AudienceController {
     }
 
     @PostMapping("/new-audience")
-    public List<AudienceDto> createAudience(@RequestBody AudienceDto audience) throws Exception {
+    public List<AudienceDto> createAudience(@RequestBody AudienceDto audience){
         return service.createNewAudience(audience);
     }
 
     @PutMapping("/edit-audience")
-    public AudienceDto editAudience(@RequestBody AudienceDto audience) throws Exception {
+    public AudienceDto editAudience(@RequestBody AudienceDto audience) {
         return service.editAudience(audience);
     }
 
     @DeleteMapping("/remove-audience")
-    public String removeAudience(@RequestParam long audienceId) throws Exception {
+    public String removeAudience(@RequestParam long audienceId) {
         return service.removeAudience(audienceId);
     }
 }

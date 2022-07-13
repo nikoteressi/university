@@ -1,7 +1,5 @@
 package com.testTask.university.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +8,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.Objects;
 
-
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

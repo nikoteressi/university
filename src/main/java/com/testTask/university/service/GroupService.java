@@ -9,9 +9,9 @@ public interface GroupService {
 
     List<GroupDto> getAllGroups();
 
-    List<GroupDto> createNewGroup(GroupDto Group) throws Exception;
+    List<GroupDto> createNewGroup(GroupDto Group);
 
-    GroupDto editGroup(GroupDto group) throws Exception;
+    GroupDto editGroup(GroupDto group);
 
-    String removeGroup(long groupId) throws NotExistException;
+    String removeGroup(long groupId);
 }

@@ -20,17 +20,17 @@ public class LectureController {
     }
 
     @PostMapping("/new-lecture")
-    public List<LectureDto> createLecture(@RequestBody LectureDto lecture) throws Exception {
+    public List<LectureDto> createLecture(@RequestBody LectureDto lecture) {
         return service.createNewLecture(lecture);
     }
 
     @PutMapping("/edit-lecture")
-    public LectureDto editLecture(@RequestBody LectureDto lecture) throws Exception {
+    public LectureDto editLecture(@RequestBody LectureDto lecture) {
         return service.editLecture(lecture);
     }
 
     @DeleteMapping("/remove-lecture")
-    public String removeLecture(@RequestParam long lectureId) throws Exception {
+    public String removeLecture(@RequestParam long lectureId) {
         return service.removeLecture(lectureId);
     }
 }

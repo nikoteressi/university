@@ -8,9 +8,9 @@ public interface AudienceService {
 
     List<AudienceDto> getAllAudiences();
 
-    List<AudienceDto> createNewAudience(AudienceDto audience) throws Exception;
+    List<AudienceDto> createNewAudience(AudienceDto audience);
 
-    AudienceDto editAudience(AudienceDto audience) throws Exception;
+    AudienceDto editAudience(AudienceDto audience);
 
-    String removeAudience(long audienceId) throws Exception;
+    String removeAudience(long audienceId);
 }

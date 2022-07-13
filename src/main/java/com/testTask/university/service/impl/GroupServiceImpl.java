@@ -33,7 +33,7 @@ public class GroupServiceImpl implements com.testTask.university.service.GroupSe
 
     @Transactional
     @Override
-    public List<GroupDto> createNewGroup(GroupDto group) throws Exception {
+    public List<GroupDto> createNewGroup(GroupDto group) {
         fieldValidator.validateGroupNumber(group.getNumber());
         checkIfExistByNumber(group.getNumber());
         repository.save(mapper.convertToEntity(group));
@@ -42,7 +42,7 @@ public class GroupServiceImpl implements com.testTask.university.service.GroupSe
 
     @Transactional
     @Override
-    public GroupDto editGroup(GroupDto group) throws Exception {
+    public GroupDto editGroup(GroupDto group) {
         fieldValidator.validateGroupNumber(group.getNumber());
         Group groupFromDb = getGroupByByNumber(group.getNumber());
         groupFromDb.setNumber(group.getNumber());
@@ -51,23 +51,23 @@ public class GroupServiceImpl implements com.testTask.university.service.GroupSe
 
     @Transactional
     @Override
-    public String removeGroup(long groupId) throws NotExistException {
+    public String removeGroup(long groupId) {
         checkIfExistToRemove(groupId);
         repository.deleteById(groupId);
         return "Group with ID: " + groupId + " has been successfully deleted.";
     }
 
-    private void checkIfExistToRemove(long id) throws NotExistException {
+    private void checkIfExistToRemove(long id) {
         if (!repository.existsById(id))
             throw new NotExistException("The group with id '" + id + "' not exist.");
     }
 
-    private void checkIfExistByNumber(int groupNumber) throws AlreadyExistException {
+    private void checkIfExistByNumber(int groupNumber) {
         if (repository.existsByNumber(groupNumber))
             throw new AlreadyExistException("The group with number '" + groupNumber + "' already exist.");
     }
 
-    private Group getGroupByByNumber(int groupNumber) throws NotExistException {
+    private Group getGroupByByNumber(int groupNumber) {
         Group groupFromDb = repository.findByNumber(groupNumber);
         if (groupFromDb == null)
             throw new NotExistException("The group with number '" + groupNumber + "' not exist.");

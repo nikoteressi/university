@@ -8,9 +8,9 @@ import java.util.List;
 public interface StudentService {
     List<StudentDto> getAllStudents();
 
-    List<StudentDto> createNewStudent(StudentDto student) throws  Exception;
+    List<StudentDto> createNewStudent(StudentDto student);
 
-    StudentDto editStudent(StudentDto student) throws  Exception;
+    StudentDto editStudent(StudentDto student);
 
-    String removeStudent(long studentId) throws NotExistException;
+    String removeStudent(long studentId);
 }

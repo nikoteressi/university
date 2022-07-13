@@ -8,9 +8,9 @@ import java.util.List;
 public interface LectureService {
     List<LectureDto> getAllLectures();
 
-    List<LectureDto> createNewLecture(LectureDto lecture) throws Exception;
+    List<LectureDto> createNewLecture(LectureDto lecture);
 
-    LectureDto editLecture(LectureDto lecture) throws Exception;
+    LectureDto editLecture(LectureDto lecture);
 
-    String removeLecture(long lectureId) throws NotExistException;
+    String removeLecture(long lectureId);
 }
