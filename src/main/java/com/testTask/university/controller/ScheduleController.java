@@ -1,7 +1,6 @@
 package com.testTask.university.controller;
 
 import com.testTask.university.dto.ScheduleDto;
-import com.testTask.university.exceptions.NotExistException;
 import com.testTask.university.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

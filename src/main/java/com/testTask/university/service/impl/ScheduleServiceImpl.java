@@ -70,13 +70,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return getAllSchedules();
     }
 
-    private void checkIfExistByGroupNumberAndDate(ScheduleDto schedule) {
-        Schedule scheduleFromDb = scheduleRepository.findByGroup_NumberAndDate(schedule.getGroupNumber(), schedule.getDate());
-        if (scheduleFromDb != null)
-            throw new AlreadyExistException("The schedule for group '" + schedule.getGroupNumber()
-                    + "' and for date '" + schedule.getDate() + "' already exists.");
-    }
-
     @Transactional
     @Override
     public ScheduleDto editSchedule(ScheduleDto schedule) {
@@ -130,5 +123,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (scheduleFromDb == null)
             throw new NotExistException("Schedule with ID: " + schedule.getScheduleId() + " not found.");
         return scheduleFromDb;
+    }
+
+    private void checkIfExistByGroupNumberAndDate(ScheduleDto schedule) {
+        Schedule scheduleFromDb = scheduleRepository.findByGroup_NumberAndDate(schedule.getGroupNumber(), schedule.getDate());
+        if (scheduleFromDb != null)
+            throw new AlreadyExistException("The schedule for group '" + schedule.getGroupNumber()
+                    + "' and for date '" + schedule.getDate() + "' already exists.");
     }
 }

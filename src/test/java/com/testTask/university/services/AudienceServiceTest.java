@@ -55,13 +55,9 @@ public class AudienceServiceTest {
     void shouldReturnAlreadyExistExceptionWhenCreateNewIfExist() {
         AudienceDto audienceDto = new AudienceDto(1L, 1);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
-        try {
-            service.createNewAudience(audienceDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof AlreadyExistException));
-            assertTrue(e.getMessage().contains("audience"));
-        }
+        AlreadyExistException alreadyExistException = assertThrows(AlreadyExistException.class,
+                () -> service.createNewAudience(audienceDto));
+        assertTrue(alreadyExistException.getMessage().contains("audience"));
         verify(repository, times(1)).existsByNumber(anyInt());
         verifyNoMoreInteractions(repository);
     }
@@ -69,13 +65,9 @@ public class AudienceServiceTest {
     @Test
     void shouldReturnWrongInputDataExceptionWhenCreateNewIfWrongNumber() {
         AudienceDto audienceDto = new AudienceDto(0, 1567);
-        try {
-            service.createNewAudience(audienceDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertTrue(e.getMessage().contains("audience"));
-        }
+        WrongInputDataException wrongInputDataException = assertThrows(WrongInputDataException.class,
+                () -> service.createNewAudience(audienceDto));
+        assertTrue(wrongInputDataException.getMessage().contains("audience"));
         verifyNoMoreInteractions(repository);
     }
 
@@ -113,13 +105,9 @@ public class AudienceServiceTest {
     void shouldThrownAnNotExistExceptionWhenEditIfThereIsNoAudience() {
         AudienceDto audienceDto = new AudienceDto(0, 12);
         when(repository.existsByNumber(anyInt())).thenReturn(false);
-        try {
-            service.editAudience(audienceDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof NotExistException));
-            assertTrue(e.getMessage().contains("audience"));
-        }
+        NotExistException notExistException = assertThrows(NotExistException.class,
+                () -> service.editAudience(audienceDto));
+        assertTrue(notExistException.getMessage().contains("audience"));
         verify(repository, times(1)).findByNumber(anyInt());
         verifyNoMoreInteractions(repository);
 
@@ -138,12 +126,9 @@ public class AudienceServiceTest {
     @Test
     void shouldReturnNotExistExceptionWhenRemoveIfNotExist() {
         when(repository.existsById(anyLong())).thenReturn(false);
-        try {
-            service.removeAudience(anyLong());
-        } catch (Exception e) {
-            assertTrue(e instanceof NotExistException);
-            assertTrue(e.getMessage().contains("audience"));
-        }
+        NotExistException notExistException = assertThrows(NotExistException.class,
+                () -> service.removeAudience(anyLong()));
+        assertTrue(notExistException.getMessage().contains("audience"));
         verify(repository, times(1)).existsById(anyLong());
         verifyNoMoreInteractions(repository);
     }

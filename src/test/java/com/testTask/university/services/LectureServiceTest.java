@@ -67,79 +67,55 @@ public class LectureServiceTest {
         LectureDto lectureDto = new LectureDto(0, "lecture1", "2022-07-12", 1, 1);
         when(lectureRepository.findByNameAndDate(anyString(), anyString()))
                 .thenReturn(new Lecture(1L, "name", "2022-03-45", new Audience(), new Group()));
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof AlreadyExistException));
-            assertNotEquals("", e.getMessage());
-        }
+        AlreadyExistException exception = assertThrows(AlreadyExistException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("lecture"));
         verify(lectureRepository, times(1)).findByNameAndDate(anyString(), anyString());
         verifyNoMoreInteractions(lectureRepository);
     }
 
     @Test
-    void shouldReturnWrongInputDataExceptionWhenCreateNewIfNameIsEmpty() {
-        LectureDto lectureDto = new LectureDto(0, "2022-07-12", "", 1, 1);
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertNotEquals("", e.getMessage());
-        }
+    void shouldReturnWrongInputDataExceptionWhenCreateNewIfDateIsEmpty() {
+        LectureDto lectureDto = new LectureDto(0, "name", "", 1, 1);
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("date"));
         verifyNoInteractions(lectureRepository);
     }
 
     @Test
     void shouldReturnWrongInputDataExceptionWhenCreateNewIfDateIncorrectFormat() {
         LectureDto lectureDto = new LectureDto(0, "12-02-2022", "lecture1", 1, 1);
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertNotEquals("", e.getMessage());
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("lecture"));
         verifyNoInteractions(lectureRepository);
     }
 
     @Test
-    void shouldReturnWrongInputDataExceptionWhenCreateNewIfDateIsEmpty() {
+    void shouldReturnWrongInputDataExceptionWhenCreateNewIfNameIsEmpty() {
         LectureDto lectureDto = new LectureDto(0, "", "lecture1", 1, 1);
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertNotEquals("", e.getMessage());
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("lecture"));
         verifyNoInteractions(lectureRepository);
     }
 
     @Test
     void shouldReturnWrongInputDataExceptionWhenCreateNewIfAudienceNumberIncorrect() {
         LectureDto lectureDto = new LectureDto(0, "", "lecture1", 0, 1);
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertNotEquals("", e.getMessage());
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("lecture"));
         verifyNoInteractions(lectureRepository);
     }
 
     @Test
     void shouldReturnWrongInputDataExceptionWhenCreateNewIfGroupNumberIncorrect() {
         LectureDto lectureDto = new LectureDto(0, "", "lecture1", 1, 1000);
-        try {
-            lectureService.createNewLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertNotEquals("", e.getMessage());
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> lectureService.createNewLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("lecture"));
         verifyNoInteractions(lectureRepository);
     }
 
@@ -190,13 +166,9 @@ public class LectureServiceTest {
     @Test
     void shouldThrownAnNotExistExceptionWhenEditIfThereIsNoLecture() {
         LectureDto lectureDto = new LectureDto(1L, "lecture1", "2022-07-15", 1, 1);
-        try {
-            lectureService.editLecture(lectureDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof NotExistException));
-            assertNotEquals("", e.getMessage());
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> lectureService.editLecture(lectureDto));
+        assertTrue(exception.getMessage().contains("Lecture"));
         verify(lectureRepository, times(1)).findById(anyLong());
         verifyNoMoreInteractions(lectureRepository);
     }
@@ -214,11 +186,9 @@ public class LectureServiceTest {
     @Test
     void shouldReturnNotExistExceptionWhenRemoveIfNotExist() {
         when(lectureRepository.existsById(anyLong())).thenReturn(false);
-        try {
-            lectureService.removeLecture(anyLong());
-        } catch (NotExistException e) {
-            assertNotEquals("", e.getMessage());
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> lectureService.removeLecture(anyLong()));
+        assertTrue(exception.getMessage().contains("Lecture"));
         verify(lectureRepository, times(1)).existsById(anyLong());
         verifyNoMoreInteractions(lectureRepository);
     }

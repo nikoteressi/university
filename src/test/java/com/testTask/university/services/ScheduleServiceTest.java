@@ -91,12 +91,9 @@ public class ScheduleServiceTest {
 
     @Test
     void shouldReturnNotExistExceptionIfStudentNotExist() {
-        try {
-            service.getStudentSchedule(1L, "2022-07-15");
-        } catch (Exception e) {
-            assertTrue(e instanceof NotExistException);
-            assertTrue(e.getMessage().contains("Student"));
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> service.getStudentSchedule(1L, "2022-07-15"));
+        assertTrue(exception.getMessage().contains("Student"));
         verify(studentRepository, times(1)).findById(anyLong());
         verifyNoMoreInteractions(studentRepository);
         verifyNoInteractions(repository);
@@ -124,38 +121,26 @@ public class ScheduleServiceTest {
     @Test
     void shouldThrownAlreadyExistExceptionIfExistWhenCreateNewSchedule() {
         when(repository.findByGroup_NumberAndDate(anyInt(), anyString())).thenReturn(new Schedule());
-        try {
-            service.createNewSchedule(new ScheduleDto(1L, "2022-07-15", 1, new ArrayList<>()));
-            fail();
-        } catch (Exception e) {
-            assertTrue(e instanceof AlreadyExistException);
-            assertNotEquals("", e.getMessage());
-        }
+        AlreadyExistException exception = assertThrows(AlreadyExistException.class,
+                () -> service.createNewSchedule((new ScheduleDto(1L, "2022-07-15", 1, new ArrayList<>()))));
+        assertTrue(exception.getMessage().contains("schedule"));
         verify(repository, times(1)).findByGroup_NumberAndDate(anyInt(), anyString());
         verifyNoMoreInteractions(repository);
     }
 
     @Test
     void shouldThrownWrongInputDataExceptionWhenCreateNewScheduleIfWrongDate() {
-        try {
-            service.createNewSchedule(new ScheduleDto(1L, "2022-07-155", 1, new ArrayList<>()));
-            fail();
-        } catch (Exception e) {
-            assertTrue(e instanceof WrongInputDataException);
-            assertTrue(e.getMessage().contains("date"));
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> service.createNewSchedule(new ScheduleDto(1L, "2022-07-155", 1, new ArrayList<>())));
+        assertTrue(exception.getMessage().contains("date"));
         verifyNoInteractions(repository);
     }
 
     @Test
     void shouldThrownWrongInputDataExceptionWhenCreateNewScheduleIfWrongGroupNumber() {
-        try {
-            service.createNewSchedule(new ScheduleDto(1L, "2022-07-15", -1, new ArrayList<>()));
-            fail();
-        } catch (Exception e) {
-            assertTrue(e instanceof WrongInputDataException);
-            assertTrue(e.getMessage().contains("group"));
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> service.createNewSchedule(new ScheduleDto(1L, "2022-07-15", -1, new ArrayList<>())));
+        assertTrue(exception.getMessage().contains("group"));
         verifyNoInteractions(repository);
     }
 
@@ -178,13 +163,9 @@ public class ScheduleServiceTest {
 
     @Test
     void shouldThrownAnNotExistExceptionIfThereIsNoScheduleWhenEdit() {
-        try {
-            service.editSchedule(new ScheduleDto(1L, "2022-07-25", 1, new ArrayList<>()));
-            fail();
-        } catch (NotExistException e) {
-            System.out.println(e.getMessage());
-            assertTrue(e.getMessage().contains("Schedule"));
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> service.editSchedule(new ScheduleDto(1L, "2022-07-25", 1, new ArrayList<>())));
+        assertTrue(exception.getMessage().contains("Schedule"));
         verify(repository, times(1)).findById(anyLong());
         verifyNoMoreInteractions(repository);
     }
@@ -202,11 +183,9 @@ public class ScheduleServiceTest {
     @Test
     void shouldReturnNotExistExceptionWhenRemoveIfNotExist() {
         when(repository.existsById(anyLong())).thenReturn(false);
-        try {
-            service.removeSchedule(anyLong());
-        } catch (NotExistException e) {
-            assertTrue(e.getMessage().contains("Schedule"));
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> service.removeSchedule(anyLong()));
+        assertTrue(exception.getMessage().contains("Schedule"));
         verify(repository, times(1)).existsById(anyLong());
         verifyNoMoreInteractions(repository);
     }

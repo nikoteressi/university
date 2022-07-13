@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @SpringBootTest
 public class GroupServiceTest {
@@ -55,13 +54,9 @@ public class GroupServiceTest {
     void shouldReturnAlreadyExistExceptionWhenCreateNewIfExist() {
         GroupDto groupDto = new GroupDto(1L, 1);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
-        try {
-            service.createNewGroup(groupDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof AlreadyExistException));
-            assertTrue(e.getMessage().contains("group"));
-        }
+        AlreadyExistException exception = assertThrows(AlreadyExistException.class,
+                () -> service.createNewGroup(groupDto));
+        assertTrue(exception.getMessage().contains("group"));
         verify(repository, times(1)).existsByNumber(anyInt());
         verifyNoMoreInteractions(repository);
     }
@@ -69,13 +64,9 @@ public class GroupServiceTest {
     @Test
     void shouldReturnWrongInputDataExceptionWhenCreateNewIfWrongNumber() {
         GroupDto groupDto = new GroupDto(0, 1567);
-        try {
-            service.createNewGroup(groupDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof WrongInputDataException));
-            assertTrue(e.getMessage().contains("number"));
-        }
+        WrongInputDataException exception = assertThrows(WrongInputDataException.class,
+                () -> service.createNewGroup(groupDto));
+        assertTrue(exception.getMessage().contains("group"));
         verifyNoInteractions(repository);
     }
 
@@ -113,13 +104,9 @@ public class GroupServiceTest {
     void shouldThrownAnNotExistExceptionWhenEditIfThereIsNoGroup() {
         GroupDto groupDto = new GroupDto(1L, 1);
         when(repository.findByNumber(anyInt())).thenReturn(null);
-        try {
-            service.editGroup(groupDto);
-            fail();
-        } catch (Exception e) {
-            assertTrue((e instanceof NotExistException));
-            assertTrue(e.getMessage().contains("group"));
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> service.editGroup(groupDto));
+        assertTrue(exception.getMessage().contains("group"));
         verify(repository, times(1)).findByNumber(anyInt());
         verifyNoMoreInteractions(repository);
     }
@@ -137,11 +124,9 @@ public class GroupServiceTest {
     @Test
     void shouldReturnNotExistExceptionWhenRemoveIfNotExist() {
         when(repository.existsById(anyLong())).thenReturn(false);
-        try {
-            service.removeGroup(anyLong());
-        } catch (NotExistException e) {
-            assertTrue(e.getMessage().contains("group"));
-        }
+        NotExistException exception = assertThrows(NotExistException.class,
+                () -> service.removeGroup(anyLong()));
+        assertTrue(exception.getMessage().contains("group"));
         verify(repository, times(1)).existsById(anyLong());
         verifyNoMoreInteractions(repository);
     }
