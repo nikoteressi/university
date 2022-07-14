@@ -18,13 +18,9 @@
  Method    | URI
 ------     | ------
 **GET:**            /api/schedules - returns all schedules
-------     | ------
 **GET:**            /api/schedules/student/{id}/date/{date} - returns student schedule by date
-------     | ------
 **POST:**          /api/schedules - create new schedule
-------     | ------
 **PUT:**             /api/schedules - edit schedule
-------     | ------
 **DELETE:**      /api/schedules/{id} - delete schedule by id
 ------     | ------
 **GET:**           /api/audiences - returns all audiences
