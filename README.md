@@ -4,7 +4,7 @@
 ### TODO
 
 * Realise CRUD methods for all entities in Application.
-* Add entry point to get schedule by student and date
+* Add end point to get schedule by student and date
 * Must start with command **docker-compouse up -d**
 * Cover with tests
 
