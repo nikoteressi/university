@@ -15,6 +15,10 @@
  
  ### URI
  
+ Method | URI
+------ | ------
+**GET:**   | /api/schedules - returns all schedules 
+ 
 * **GET:**            /api/schedules - returns all schedules
 * **GET:**            /api/schedules/student/{id}/date/{date} - returns student schedule by date
 * **POST:**          /api/schedules - create new schedule
