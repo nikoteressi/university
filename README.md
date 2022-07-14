@@ -8,3 +8,7 @@
 * Must start with command **docker-compouse up -d**
 * Cover with tests
 
+
+ End poit to get student schedule **/api/schedules/student/{studentId}/date/{date}**
+ 
+ Date format **YYYY-MM-DD**
