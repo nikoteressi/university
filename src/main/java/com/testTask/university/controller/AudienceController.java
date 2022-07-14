@@ -9,28 +9,28 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/audience")
+@RequestMapping("/api/audiences")
 public class AudienceController {
 
     private final AudienceService service;
 
-    @GetMapping("/all-audiences")
+    @GetMapping
     public List<AudienceDto> getAllAudiences() {
         return service.getAllAudiences();
     }
 
-    @PostMapping("/new-audience")
+    @PostMapping
     public List<AudienceDto> createAudience(@RequestBody AudienceDto audience){
         return service.createNewAudience(audience);
     }
 
-    @PutMapping("/edit-audience")
+    @PutMapping
     public AudienceDto editAudience(@RequestBody AudienceDto audience) {
         return service.editAudience(audience);
     }
 
-    @DeleteMapping("/remove-audience")
-    public String removeAudience(@RequestParam long audienceId) {
+    @DeleteMapping("/{audienceId}")
+    public String removeAudience(@PathVariable long audienceId) {
         return service.removeAudience(audienceId);
     }
 }

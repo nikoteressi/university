@@ -43,7 +43,7 @@ public class GroupControllerTest {
         List<Group> list = new ArrayList<>();
         list.add(group);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(get("/api/group/all-groups"))
+        mockMvc.perform(get("/api/groups"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -57,7 +57,7 @@ public class GroupControllerTest {
         list.add(group);
         when(repository.save(group)).thenReturn(group);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(post("/api/group/new-group")
+        mockMvc.perform(post("/api/groups")
                         .content(objectMapper.writeValueAsString(groupDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -69,7 +69,7 @@ public class GroupControllerTest {
     public void shouldReturnAlreadyExistStatusWhenCreateNewIfExist() throws Exception {
         GroupDto groupDto = new GroupDto(1L,  12);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
-        mockMvc.perform(post("/api/group/new-group")
+        mockMvc.perform(post("/api/groups")
                         .content(objectMapper.writeValueAsString(groupDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ public class GroupControllerTest {
         Group group = new Group(1L, 45, new ArrayList<>(), new ArrayList<>(), new Schedule());
         when(repository.findByNumber(anyInt())).thenReturn(group);
         when(repository.save(group)).thenReturn(group);
-        mockMvc.perform(put("/api/group/edit-group")
+        mockMvc.perform(put("/api/groups")
                         .content(objectMapper.writeValueAsString(groupDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -97,7 +97,7 @@ public class GroupControllerTest {
     @Test
     public void shouldReturnStatusNotFoundAndMessageWhenUpdateIfNotExist() throws Exception {
         GroupDto groupDto = new GroupDto(1L,  12);
-        mockMvc.perform(put("/api/group/edit-group")
+        mockMvc.perform(put("/api/groups")
                         .content(objectMapper.writeValueAsString(groupDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -109,9 +109,9 @@ public class GroupControllerTest {
 
     @Test
     public void shouldReturnSuccessAfterRemoving() throws Exception {
-        String response = "Group with ID: 0 has been successfully deleted.";
+        String response = "Group with ID: 1 has been successfully deleted.";
         given(repository.existsById(anyLong())).willReturn(true);
-        mockMvc.perform(delete("/api/group/remove-group")
+        mockMvc.perform(delete("/api/groups/1")
                         .param("groupId", String.valueOf(anyLong())))
                 .andDo(print())
                 .andExpect(content().string(response))
@@ -121,11 +121,10 @@ public class GroupControllerTest {
     @Test
     public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
-        mockMvc.perform(delete("/api/group/remove-group")
-                        .param("groupId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/groups/1"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("message").value("The group with id '0' not exist."))
+                .andExpect(jsonPath("message").value("The group with id '1' not exist."))
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }

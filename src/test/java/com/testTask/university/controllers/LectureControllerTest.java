@@ -55,7 +55,7 @@ public class LectureControllerTest {
         List<Lecture> list = new ArrayList<>();
         list.add(lecture);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(get("/api/lecture/all-lectures"))
+        mockMvc.perform(get("/api/lectures"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -73,7 +73,7 @@ public class LectureControllerTest {
         when(audienceRepository.findByNumber(anyInt())).thenReturn(audience);
         when(repository.save(lecture)).thenReturn(lecture);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(post("/api/lecture/new-lecture")
+        mockMvc.perform(post("/api/lectures")
                         .content(objectMapper.writeValueAsString(lectureDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,7 +86,7 @@ public class LectureControllerTest {
         LectureDto lectureDto = new LectureDto(1L,  "name2", "2022-09-23", 12, 25);
         Lecture lecture = new Lecture(1L, "name", "2022-11-23", new Audience(), new Group());
         when(repository.findByNameAndDate(anyString(), anyString())).thenReturn(lecture);
-        mockMvc.perform(post("/api/lecture/new-lecture")
+        mockMvc.perform(post("/api/lectures")
                         .content(objectMapper.writeValueAsString(lectureDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -106,7 +106,7 @@ public class LectureControllerTest {
         when(audienceRepository.findByNumber(anyInt())).thenReturn(audience);
         when(repository.findById(anyLong())).thenReturn(Optional.of(lecture));
         when(repository.save(lecture)).thenReturn(lecture);
-        mockMvc.perform(put("/api/lecture/edit-lecture")
+        mockMvc.perform(put("/api/lectures")
                         .content(objectMapper.writeValueAsString(lectureDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +119,7 @@ public class LectureControllerTest {
     @Test
     public void shouldReturnStatusNotFoundAndMessageWhenUpdateIfNotExist() throws Exception {
         LectureDto lectureDto = new LectureDto(1L,  "name", "2022-11-23", 12, 25);
-        mockMvc.perform(put("/api/lecture/edit-lecture")
+        mockMvc.perform(put("/api/lectures")
                         .content(objectMapper.writeValueAsString(lectureDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -131,10 +131,9 @@ public class LectureControllerTest {
 
     @Test
     public void shouldReturnSuccessAfterRemoving() throws Exception {
-        String response = "Lecture with ID '0' has been successfully deleted.";
+        String response = "Lecture with ID '1' has been successfully deleted.";
         given(repository.existsById(anyLong())).willReturn(true);
-        mockMvc.perform(delete("/api/lecture/remove-lecture")
-                        .param("lectureId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/lectures/1"))
                 .andDo(print())
                 .andExpect(content().string(response))
                 .andExpect(status().isOk());
@@ -143,11 +142,10 @@ public class LectureControllerTest {
     @Test
     public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
-        mockMvc.perform(delete("/api/lecture/remove-lecture")
-                        .param("lectureId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/lectures/1"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("message").value("Lecture with ID '0' not exist."))
+                .andExpect(jsonPath("message").value("Lecture with ID '1' not exist."))
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }

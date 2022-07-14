@@ -55,7 +55,7 @@ public class ScheduleControllerTest {
         list.add(new Schedule(3L, "2022-07-13",
                 new Group(1L, 12, new ArrayList<>(), new ArrayList<>(), new Schedule())));
         given(repository.findAll()).willReturn(list);
-        mockMvc.perform(get("/api//schedule/all-schedules"))
+        mockMvc.perform(get("/api/schedules"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -69,7 +69,7 @@ public class ScheduleControllerTest {
         given(repository.findByGroup_IdAndDate(anyLong(), anyString())).willReturn(schedule);
         given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
         given(repository.save(schedule)).willReturn(schedule);
-        mockMvc.perform(get("/api//schedule/student-schedule?studentId=1&scheduleDate=2022-07-13"))
+        mockMvc.perform(get("/api/schedules/student/1/date/2022-07-13"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("date").value(schedule.getDate()))
@@ -87,7 +87,7 @@ public class ScheduleControllerTest {
         given(repository.findByGroup_IdAndDate(anyLong(), anyString())).willReturn(null);
         given(studentRepository.findById(anyLong())).willReturn(Optional.of(student));
         given(repository.save(schedule)).willReturn(schedule);
-        mockMvc.perform(get("/api//schedule/student-schedule?studentId=1&scheduleDate=2022-07-13"))
+        mockMvc.perform(get("/api/schedules/student/1/date/2022-07-13"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("date").value(schedule.getDate()))
@@ -105,7 +105,7 @@ public class ScheduleControllerTest {
 
         given(groupRepository.findByNumber(anyInt())).willReturn(new Group());
         given(repository.findAll()).willReturn(list);
-        mockMvc.perform(post("/api//schedule/new-schedule")
+        mockMvc.perform(post("/api/schedules")
                         .content(objectMapper.writeValueAsString(schedule))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -122,7 +122,7 @@ public class ScheduleControllerTest {
         given(groupRepository.findByNumber(anyInt())).willReturn(group);
         given(repository.findById(anyLong())).willReturn(Optional.of(scheduleE));
         given(repository.save(scheduleE)).willReturn(scheduleE);
-        mockMvc.perform(put("/api//schedule/edit-schedule")
+        mockMvc.perform(put("/api/schedules")
                         .content(objectMapper.writeValueAsString(schedule))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -138,7 +138,7 @@ public class ScheduleControllerTest {
 
         given(groupRepository.findByNumber(anyInt())).willReturn(group);
         given(repository.save(scheduleE)).willReturn(scheduleE);
-        mockMvc.perform(put("/api//schedule/edit-schedule")
+        mockMvc.perform(put("/api/schedules")
                         .content(objectMapper.writeValueAsString(schedule))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -149,9 +149,9 @@ public class ScheduleControllerTest {
 
     @Test
     public void shouldReturnSuccessAfterRemoving() throws Exception {
-        String response = "Schedule with ID: 0 has been successfully deleted.";
+        String response = "Schedule with ID: 1 has been successfully deleted.";
         given(repository.existsById(anyLong())).willReturn(true);
-        mockMvc.perform(delete("/api//schedule/remove-schedule")
+        mockMvc.perform(delete("/api/schedules/1")
                         .param("scheduleId", String.valueOf(anyLong())))
                 .andDo(print())
                 .andExpect(content().string(response))
@@ -161,11 +161,11 @@ public class ScheduleControllerTest {
     @Test
     public void shouldReturnStatusNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
-        mockMvc.perform(delete("/api//schedule/remove-schedule")
+        mockMvc.perform(delete("/api/schedules/1")
                         .param("scheduleId", String.valueOf(anyLong())))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("message").value("Schedule with ID: 0 not found."))
+                .andExpect(jsonPath("message").value("Schedule with ID: 1 not found."))
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }

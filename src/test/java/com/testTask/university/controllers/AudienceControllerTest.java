@@ -41,7 +41,7 @@ public class AudienceControllerTest {
         List<Audience> list = new ArrayList<>();
         list.add(audience);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(get("/api/audience/all-audiences"))
+        mockMvc.perform(get("/api/audiences"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -55,7 +55,7 @@ public class AudienceControllerTest {
         list.add(audience);
         when(repository.save(audience)).thenReturn(audience);
         when(repository.findAll()).thenReturn(list);
-        mockMvc.perform(post("/api/audience/new-audience")
+        mockMvc.perform(post("/api/audiences")
                         .content(objectMapper.writeValueAsString(audienceDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -67,7 +67,7 @@ public class AudienceControllerTest {
     public void shouldReturnConflictStatusWhenCreateNewIfExist() throws Exception {
         AudienceDto audienceDto = new AudienceDto(1L, 12);
         when(repository.existsByNumber(anyInt())).thenReturn(true);
-        mockMvc.perform(post("/api/audience/new-audience")
+        mockMvc.perform(post("/api/audiences")
                         .content(objectMapper.writeValueAsString(audienceDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -83,7 +83,7 @@ public class AudienceControllerTest {
         Audience audience = new Audience(1L, 45, new ArrayList<>());
         when(repository.findByNumber(anyInt())).thenReturn(audience);
         when(repository.save(audience)).thenReturn(audience);
-        mockMvc.perform(put("/api/audience/edit-audience")
+        mockMvc.perform(put("/api/audiences")
                         .content(objectMapper.writeValueAsString(audienceDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -95,7 +95,7 @@ public class AudienceControllerTest {
     @Test
     public void shouldReturnNotFoundStatusAndMessageWhenUpdateIfNotExist() throws Exception {
         AudienceDto audienceDto = new AudienceDto(1L, 12);
-        mockMvc.perform(put("/api/audience/edit-audience")
+        mockMvc.perform(put("/api/audiences")
                         .content(objectMapper.writeValueAsString(audienceDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -107,10 +107,9 @@ public class AudienceControllerTest {
 
     @Test
     public void shouldReturnSuccessAfterRemoving() throws Exception {
-        String response = "Audience with ID: 0 has been successfully deleted.";
+        String response = "Audience with ID: 1 has been successfully deleted.";
         given(repository.existsById(anyLong())).willReturn(true);
-        mockMvc.perform(delete("/api/audience/remove-audience")
-                        .param("audienceId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/audiences/1"))
                 .andDo(print())
                 .andExpect(content().string(response))
                 .andExpect(status().isOk());
@@ -119,11 +118,10 @@ public class AudienceControllerTest {
     @Test
     public void shouldReturnNotFoundStatusAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
-        mockMvc.perform(delete("/api/audience/remove-audience")
-                        .param("audienceId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/audiences/1"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("message").value("The audience with id '0' not exist."))
+                .andExpect(jsonPath("message").value("The audience with id '1' not exist."))
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }

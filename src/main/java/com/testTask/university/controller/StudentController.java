@@ -9,28 +9,28 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/student")
+@RequestMapping("/api/students")
 public class StudentController {
 
     private final StudentService service;
 
-    @GetMapping("/all-students")
+    @GetMapping
     public List<StudentDto> getAllStudents() {
         return service.getAllStudents();
     }
 
-    @PostMapping("/new-student")
+    @PostMapping
     public List<StudentDto> createStudent(@RequestBody StudentDto student) {
         return service.createNewStudent(student);
     }
 
-    @PutMapping("/edit-student")
+    @PutMapping
     public StudentDto editStudent(@RequestBody StudentDto student) {
         return service.editStudent(student);
     }
 
-    @DeleteMapping("/remove-student")
-    public String removeStudent(@RequestParam long studentId) {
+    @DeleteMapping("/{studentId}")
+    public String removeStudent(@PathVariable long studentId) {
         return service.removeStudent(studentId);
     }
 }

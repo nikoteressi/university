@@ -9,34 +9,34 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/schedule")
+@RequestMapping("/api/schedules")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
-    @GetMapping("/all-schedules")
+    @GetMapping
     public List<ScheduleDto> getAllSchedules() {
         return scheduleService.getAllSchedules();
     }
 
-    @GetMapping("/student-schedule")
-    public ScheduleDto getStudentSchedule(@RequestParam("studentId") long studentId,
-                                          @RequestParam("scheduleDate") String scheduleDate) {
+    @GetMapping("/student/{studentId}/date/{scheduleDate}")
+    public ScheduleDto getStudentSchedule(@PathVariable("studentId") long studentId,
+                                          @PathVariable("scheduleDate") String scheduleDate) {
         return scheduleService.getStudentSchedule(studentId, scheduleDate);
     }
 
-    @PostMapping("/new-schedule")
+    @PostMapping
     public List<ScheduleDto> addSchedule(@RequestBody ScheduleDto schedule) {
         return scheduleService.createNewSchedule(schedule);
     }
 
-    @PutMapping("/edit-schedule")
+    @PutMapping
     public ScheduleDto editSchedule(@RequestBody ScheduleDto schedule) {
         return scheduleService.editSchedule(schedule);
     }
 
-    @DeleteMapping("/remove-schedule")
-    public String removeSchedule(@RequestParam long scheduleId) {
+    @DeleteMapping("/{scheduleId}")
+    public String removeSchedule(@PathVariable long scheduleId) {
         return scheduleService.removeSchedule(scheduleId);
     }
 }

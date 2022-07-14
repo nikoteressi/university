@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -51,7 +50,7 @@ public class StudentControllerTest {
         list.add(new Student(1L, "name2", "lastname", new Group()));
         list.add(new Student(1L, "name3", "lastname", new Group()));
         given(repository.findAll()).willReturn(list);
-        mockMvc.perform(get("/api/student/all-students"))
+        mockMvc.perform(get("/api/students"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -67,7 +66,7 @@ public class StudentControllerTest {
         given(groupRepository.findByNumber(anyInt())).willReturn(group);
         given(repository.findAll()).willReturn(list);
         given(repository.save(student)).willReturn(student);
-        mockMvc.perform(post("/api/student/new-student")
+        mockMvc.perform(post("/api/students")
                         .content(objectMapper.writeValueAsString(studentDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -83,7 +82,7 @@ public class StudentControllerTest {
         given(groupRepository.findByNumber(anyInt())).willReturn(group);
         given(repository.findById(anyLong())).willReturn(Optional.of(student));
         given(repository.save(student)).willReturn(student);
-        mockMvc.perform(put("/api/student/edit-student")
+        mockMvc.perform(put("/api/students")
                         .content(objectMapper.writeValueAsString(studentDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -98,7 +97,7 @@ public class StudentControllerTest {
         Group group = new Group(1L, 12, new ArrayList<>(), new ArrayList<>(), new Schedule());
         StudentDto studentDto = new StudentDto(1L, "name4", "lastname35", 12);
         given(groupRepository.findByNumber(anyInt())).willReturn(group);
-        mockMvc.perform(put("/api/student/edit-student")
+        mockMvc.perform(put("/api/students")
                         .content(objectMapper.writeValueAsString(studentDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -110,10 +109,9 @@ public class StudentControllerTest {
 
     @Test
     public void shouldReturnSuccessAfterRemoving() throws Exception {
-        String response = "Student with ID '0' has been successfully deleted.";
+        String response = "Student with ID '1' has been successfully deleted.";
         given(repository.existsById(anyLong())).willReturn(true);
-        mockMvc.perform(delete("/api/student/remove-student")
-                        .param("studentId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/students/1"))
                 .andDo(print())
                 .andExpect(content().string(response))
                 .andExpect(status().isOk());
@@ -122,11 +120,10 @@ public class StudentControllerTest {
     @Test
     public void shouldReturnErrorCodeNotFoundAndMessageAfterRemovingIfNotExist() throws Exception {
         given(repository.existsById(anyLong())).willReturn(false);
-        mockMvc.perform(delete("/api/student/remove-student")
-                        .param("studentId", String.valueOf(anyLong())))
+        mockMvc.perform(delete("/api/students/1"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("message").value("The Student with ID '0' not exist."))
+                .andExpect(jsonPath("message").value("The Student with ID '1' not exist."))
                 .andExpect(jsonPath("status").value("404"))
                 .andExpect(status().isNotFound());
     }

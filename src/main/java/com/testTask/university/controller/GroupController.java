@@ -9,28 +9,28 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/group")
+@RequestMapping("/api/groups")
 public class GroupController {
 
     private final GroupService service;
 
-    @GetMapping("/all-groups")
+    @GetMapping
     public List<GroupDto> getAllGroups() {
         return service.getAllGroups();
     }
 
-    @PostMapping("/new-group")
+    @PostMapping
     public List<GroupDto> createGroup(@RequestBody GroupDto group) {
         return service.createNewGroup(group);
     }
 
-    @PutMapping("/edit-group")
+    @PutMapping
     public GroupDto editGroup(@RequestBody GroupDto group) {
         return service.editGroup(group);
     }
 
-    @DeleteMapping("/remove-group")
-    public String removeGroup(@RequestParam long groupId) {
+    @DeleteMapping("/{groupId}")
+    public String removeGroup(@PathVariable long groupId) {
         return service.removeGroup(groupId);
     }
 }
