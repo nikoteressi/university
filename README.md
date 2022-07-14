@@ -13,7 +13,7 @@
  
  Date format **YYYY-MM-DD**
  
- ###URI
+ ### URI
  
 GET            /api/schedules - returns all schedules
 GET            /api/schedules/student/{id}/date/{date} - returns student schedule by date
